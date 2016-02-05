@@ -51,28 +51,6 @@ https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 """ % os.path.abspath(os.path.join(os.path.dirname(__file__),
                                    CLIENT_SECRETS_FILE))
 
-now = datetime.now()
-one_day_ago = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-one_week_ago = (now - timedelta(days=365)).strftime("%Y-%m-%d")
-
-parser = OptionParser()
-parser.add_option("--metrics", dest="metrics", help="Report metrics",
-  default="views,comments,favoritesAdded,favoritesRemoved,likes,dislikes,shares")
-parser.add_option("--dimensions", dest="dimensions", help="Report dimensions",
-  default="video")
-parser.add_option("--start-date", dest="start_date",
-  help="Start date, in YYYY-MM-DD format", default=one_week_ago)
-#parser.add_option("--filters", dest="filters",
- # help="Filters go here", default='6f17jCKpxcE'),
-parser.add_option("--end-date", dest="end_date",
- help="End date, in YYYY-MM-DD format", default=one_day_ago)
-parser.add_option("--start-index", dest="start_index", help="Start index",
-  default=1, type="int")
-parser.add_option("--max-results", dest="max_results", help="Max results",
-  default=200, type="int")
-parser.add_option("--sort", dest="sort", help="Sort order", default="-views")
-(options, args) = parser.parse_args()
-
 flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
   message=MISSING_CLIENT_SECRETS_MESSAGE,
   scope=" ".join(YOUTUBE_SCOPES))
@@ -89,17 +67,10 @@ youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, http=http)
 youtube_analytics = build(YOUTUBE_ANALYTICS_API_SERVICE_NAME,
   YOUTUBE_ANALYTICS_API_VERSION, http=http)
 
-# The below checks what channel you auth against and returns the channel ID
-# To variable channel_id
-channels_response = youtube.channels().list(
-  mine=True,
-  part="id"
-).execute()
+# Place the prameters in to .list() and a JSON response will be returned. This
+# is a search against the YouTube Data API
+youtube_data_response = youtube.search().list()
 
-for channel in channels_response.get("items", []):
-  channel_id = channel["id"]
-
-# Connects to sqlite database created by youtube.py and pulls in videoIDs
-# IDs are passed to VIDEO_ID list. Counter provides fix for bug that would
-# print a header for each video. It's also used at the end to report how
-# many videos were analyzed.
+# Place the prameters into .query() and a JSON response will be returned. This
+# is a search against the YouTube Analytics API
+youtube_analytics_response = youtube_analytics.reports().query()
