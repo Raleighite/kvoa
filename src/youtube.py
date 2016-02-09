@@ -2,8 +2,6 @@ from datetime import datetime, timedelta
 import httplib2
 import os
 import sys
-import sqlite3
-import csv
 
 import argparse
 from oauth2client import file, client, tools
@@ -11,19 +9,9 @@ from oauth2client import file, client, tools
 from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client.client import flow_from_clientsecrets
-#from oauth2client.tools import run
 from optparse import OptionParser
 
 
-# CLIENT_SECRETS_FILE, name of a file containing the OAuth 2.0 information for
-# this application, including client_id and client_secret. You can acquire an
-# ID/secret pair from the API Access tab on the Google APIs Console
-#   http://code.google.com/apis/console#access
-# For more information about using OAuth2 to access Google APIs, please visit:
-#   https://developers.google.com/accounts/docs/OAuth2
-# For more information about the client_secrets.json file format, please visit:
-#   https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
-# Please ensure that you have enabled the YouTube Data & Analytics APIs for your project.
 CLIENT_SECRETS_FILE = "client_secrets.json"
 
 # We will require read-only access to the YouTube Data and Analytics API.
