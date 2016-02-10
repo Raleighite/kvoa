@@ -3,6 +3,7 @@ import httplib2
 import os
 import sys
 
+
 import argparse
 from oauth2client import file, client, tools
 
@@ -57,8 +58,37 @@ youtube_analytics = build(YOUTUBE_ANALYTICS_API_SERVICE_NAME,
 
 # Place the prameters in to .list() and a JSON response will be returned. This
 # is a search against the YouTube Data API
-youtube_data_response = youtube.search().list()
+def get_ytData_response(part='snippet', forMine=True, maxResults=50,
+                         type='video', pageToken=None):
+        youtube_data_response = youtube.search().list(
+                                            part=part,
+                                            forMine=forMine,
+                                            maxResults=maxResults,
+                                            type=type,
+                                            pageToken=pageToken)
+        youtube_data = youtube_data_response.execute()
+        return youtube_data
+
+def grab_video_ids(youtube_data):
+    for item in youtube_data['items']:
+        print(item['snippet']['title'])
+        print(item['id']['videoId'])
+        print(item['snippet']['publishedAt'])
+
+# Currently this script counts as three requests. The final request only returns
+# a blank page, but still counts as one request against the quota.
+youtubeData = get_ytData_response()
+counter = round(youtubeData['pageInfo']['totalResults']/50)
+grab_video_ids(youtubeData)
+
+while counter > 0:
+    youtubeData2 = get_ytData_response(pageToken=youtubeData['nextPageToken'])
+    grab_video_ids(youtubeData2)
+    counter -= 1
+# To-DO:
+#       Send video titles, and IDs to database
+
 
 # Place the prameters into .query() and a JSON response will be returned. This
 # is a search against the YouTube Analytics API
-youtube_analytics_response = youtube_analytics.reports().query()
+#youtube_analytics_response = youtube_analytics.reports().query()
