@@ -11,7 +11,7 @@ from apiclient.discovery import build
 from oauth2client.file import Storage
 from oauth2client.client import flow_from_clientsecrets
 
-from models import Video
+import models
 
 
 CLIENT_SECRETS_FILE = "client_secrets.json"
@@ -75,18 +75,17 @@ def grab_video_ids(youtube_data):
         print(item['snippet']['title'])
         print(item['id']['videoId'])
         print(item['snippet']['publishedAt'])
-        try:
-            Video.create(video_id=item['id']['videoId'],
-                         title=item['snippet']['title'],
-                         publication_date=item['snippet']['publishedAt'])
-        except IntegrityError:
-            continue
+
+        models.Video.create_video(video_id=item['id']['videoId'],
+                     title=item['snippet']['title'],
+                     publication_date=item['snippet']['publishedAt'])
+
 
 
 # Currently this script counts as three requests. The final request only returns
 # a blank page, but still counts as one request against the quota.
 youtubeData = get_ytData_response()
-counter = round(youtubeData['pageInfo']['totalResults']/50)
+counter = round(youtubeData['pageInfo']['totalResults']/50)-1
 grab_video_ids(youtubeData)
 
 while counter > 0:
