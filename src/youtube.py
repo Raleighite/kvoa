@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import httplib2
 import os
 import sys
-
+import iso8601
 
 import argparse
 from oauth2client import file, client, tools
@@ -75,10 +75,13 @@ def grab_video_ids(youtube_data):
         print(item['snippet']['title'])
         print(item['id']['videoId'])
         print(item['snippet']['publishedAt'])
-
-        models.Video.create_video(video_id=item['id']['videoId'],
-                     title=item['snippet']['title'],
-                     publication_date=item['snippet']['publishedAt'])
+        pub_date = iso8601.parse_date(item['snippet']['publishedAt'])
+        try:
+            models.Video.create_video(video_id=item['id']['videoId'],
+                         title=item['snippet']['title'],
+                         publication_date=pub_date)
+        except ValueError:
+            continue
 
 
 
