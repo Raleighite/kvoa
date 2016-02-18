@@ -88,13 +88,14 @@ def grab_video_ids(youtube_data):
 # Currently this script counts as three requests. The final request only returns
 # a blank page, but still counts as one request against the quota.
 youtubeData = get_ytData_response()
-counter = round(youtubeData['pageInfo']['totalResults']/50)-1
+counter = round(youtubeData['pageInfo']['totalResults']/50)+1
 grab_video_ids(youtubeData)
 
-while counter > 0:
-    youtubeData2 = get_ytData_response(pageToken=youtubeData['nextPageToken'])
+next_page = youtubeData['nextPageToken']
+for i in range(counter):
+    youtubeData2 = get_ytData_response(pageToken=next_page)
     grab_video_ids(youtubeData2)
-    counter -= 1
+    next_page = youtubeData2['nextPageToken']
 # To-DO:
 #       Send video titles, and IDs to database
 
